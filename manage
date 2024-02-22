@@ -536,6 +536,7 @@ waitForAgent(){
 }
 
 startAgent() {
+  echo ">>> startAgent"
   local NAME=$1
   local CONTAINER_NAME=$2
   local IMAGE_NAME=$3
@@ -633,6 +634,7 @@ getAgentVersion(){
 }
 
 createNetwork() {
+  echo ">>> createNetwork"
   if [[ -z `docker network ls -q --filter "name=aath_network"` ]]; then
     docker network create aath_network --subnet=174.96.0.0/16 > /dev/null
   fi
@@ -658,6 +660,7 @@ auxiliaryService() {
 }
 
 startServices() {
+  echo "startServices >>>"
   # sets if services this procedure starts should be stopped automatically
   if [[ "auto" = $1 ]]; then
     export AUTO_CLEANUP=true
@@ -788,6 +791,7 @@ serviceCommand() {
 }
 
 startHarness(){
+  echo ">>> startHarness"
   echo Agents to be used:
   echo "  Acme - ${ACME}"
   echo "  Bob - ${BOB}"
@@ -864,6 +868,7 @@ startHarness(){
   if [[ "${REPORT}" = "allure" ]]; then
     writeEnvProperties
   fi
+  echo "<<< startHarness"
 }
 
 deleteAgents() {
@@ -962,6 +967,7 @@ runRunSet() {
 }
 
 runTests() {
+  echo ">>> runTests"
   runArgs=${@}
 
   if [[ "${TAGS}" ]]; then
@@ -980,6 +986,7 @@ runTests() {
   export BEHAVE_INI_TMP="$(pwd)/behave.ini.tmp"
   cp ${BEHAVE_INI} ${BEHAVE_INI_TMP}
 
+  echo "runTests: starting test harness, DOCKER_ENV = $DOCKER_ENV"
   if [[ "${REPORT}" = "allure" && "${COMMAND}" != "dry-run" ]]; then
       echo "Executing tests with Allure Reports."
       ${terminalEmu} docker run ${INTERACTIVE} --rm --network="host" -v ${BEHAVE_INI_TMP}:/aries-test-harness/behave.ini -v "$(pwd)/aries-test-harness/allure/allure-results:/aries-test-harness/allure/allure-results/" $DOCKER_ENV aries-test-harness -k ${runArgs} -f allure_behave.formatter:AllureFormatter -o ./allure/allure-results -f progress -D Acme=http://0.0.0.0:9020 -D Bob=http://0.0.0.0:9030 -D Faber=http://0.0.0.0:9040 -D Mallory=http://0.0.0.0:9050
@@ -1287,6 +1294,7 @@ case "${COMMAND}" in
     ;;
 
   run)
+      echo ">>> run"
       startHarness
       echo ""
       runTests ${TAGS} ${@}
